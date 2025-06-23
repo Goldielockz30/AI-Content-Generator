@@ -1,0 +1,84 @@
+# Step by Step Guide
+
+Build your own AI-powered content generator using fully local tools (no OpenAI). 
+
+This generator will let users input a niche and get multiple posts with emojis and hashtags—outputting .txt or .csv formats.
+
+## Tool kit
+
+- Python - It's where all your code, logic and LLM interaction, lives.
+
+- VS Code + Python extension - The easiest, free, professional coding editor. You will run your python and streamlit apps from here.
+
+- Ollama - This runs your Large Language Model we are using Mistral.
+
+- Streamlit (clean dashboard UI) - turns your python into a web app with zero front end coding.
+
+- Your own machine - Local Hosting (no internet needed after setup)
+
+
+### Download Python
+
+
+- Windows: Download and install from [python.org](https://www.python.org/) or via the Microsoft Store. Be sure to check “Add Python to PATH” in the installer .
+
+- MacOS/Linux: Usually comes pre-installed, or install via:
+
+```bash
+brew install python  # macOS (Homebrew)
+sudo apt-get install python3  # Ubuntu/Debian
+
+```
+
+### Im using VS Code with python extension
+
+- If you dont already have it download VSCode from https://code.visualstudio.com/ and install the python extension
+
+- To check if you have python installed locally in vs code
+
+```bash 
+Python 3.12.1
+```
+
+
+### Create a virtual environment
+
+```bash
+python -m venv venv
+
+venv\Scripts\activate      # Windows
+
+```
+```bash
+python -m venv venv
+source venv/bin/activate   # macOS/Linux
+```
+
+### Install dependencies
+
+```bash 
+pip install langchain langchain-ollama ollama pandas streamlit
+
+```
+
+Upgrade pip if it suggests just copy and paste
+
+```bash
+python.exe -m pip install --upgrade pip
+```
+
+### Install Ollama for local LLM hosting
+
+- https://ollama.com/download
+
+- Download the model 
+
+```bash
+ollama pull mistral
+
+```
+
+
+
+
+
