@@ -438,7 +438,7 @@ streamlit run app.py
 
 - Multi-niche comparisons or history of generated posts
 
-- Create a file named generate.py
+
 
 # 🧠  Refine Your Prompts
 
