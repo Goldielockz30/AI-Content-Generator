@@ -243,7 +243,7 @@ def get_post_strings(posts):
         text = p.get('text', '').strip()
         hashtags = p.get('hashtags', [])
         clean_tags = [tag.strip().replace(" ", "") for tag in hashtags if tag.strip()]
-        line = f"{text} {' '.join(clean_tags)}"
+        line = text # Hashtags already included in 'text'
         lines.append(line)
     return lines
 
