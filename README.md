@@ -77,13 +77,33 @@ python -m venv venv
 source venv/bin/activate   # macOS/Linux
 ```
 
-### Install dependencies
+### Install python packages
 
-```bash 
-pip install langchain langchain-ollama ollama pandas streamlit
+# Create a requirements.txt file
+
+```bash
+pip freeze > requirements.txt
+
+```
+- Replace the long list in the requirements.txt file with this because this is what we are using for this project we can adjust if needed
+
+```bash
+pandas>=2.0.0
+langchain-core>=0.3.66
+langchain-ollama>=0.3.3
+streamlit>=1.46.0
+altair>=5.5.0
 ```
 
-Upgrade pip if it suggests just copy and paste
+- Now you can run this code to install requirements
+
+```bash
+pip install -r requirements.txt
+
+```
+
+
+- Upgrade pip if it suggests just copy and paste
 
 ```bash
 python.exe -m pip install --upgrade pip
@@ -270,28 +290,6 @@ move hair.csv examples\
 move hair.txt examples\ 
 ```
 
-# Create a requirements.txt file
-
-```bash
-pip freeze > requirements.txt
-
-```
-- Replace the long list in the requirements.txt file with this
-
-```bash
-pandas>=2.0.0
-langchain-core>=0.3.66
-langchain-ollama>=0.3.3
-streamlit>=1.46.0
-altair>=5.5.0
-```
-
-- Now you can run this code to install requirements
-
-```bash
-pip install -r requirements.txt
-
-```
 
 # Bonus! Create a Dashboard - with downloadable outputs
 
