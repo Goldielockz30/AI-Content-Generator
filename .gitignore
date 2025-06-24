@@ -8,3 +8,5 @@ __pycache__/
 # Ignore OS and editor temp files
 .DS_Store
 *.swp
+
+.streamlit/

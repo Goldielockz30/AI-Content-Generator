@@ -308,57 +308,58 @@ New-Item -Path . -Name "app.py" -ItemType "File"
 
 import streamlit as st
 import pandas as pd
-import json
-from generate import generate_posts, clean_hashtags, get_post_strings  # reuse your logic
+from generate import generate_posts, clean_hashtags, get_post_strings
 
 st.title("Social Media Post Generator")
 
-# User inputs
-niche = st.text_input("Enter niche:", placeholder="e.g., nails, fitness, tech gadgets")
-count = st.number_input("Number of posts (max 5):", min_value=1, max_value=5, value=1, step=1)
+# Ask for email first
+email = st.text_input("Enter your email to get started:")
 
-# When user clicks Generate, store posts in session_state
-if st.button("Generate Posts"):
-    with st.spinner("Generating posts..."):
-        posts = generate_posts(niche, count)
-        posts = clean_hashtags(posts)
-        post_list = get_post_strings(posts)
-        st.session_state['posts'] = posts
-        st.session_state['post_list'] = post_list
-        st.session_state['niche'] = niche
+# Email validator
+def is_valid_email(e):
+    return "@" in e and "." in e and len(e) > 5
 
-# Display saved posts and download buttons if available
-if 'posts' in st.session_state and st.session_state['posts']:
-    posts = st.session_state['posts']
-    post_list = st.session_state['post_list']
-    niche = st.session_state['niche']
+# Only show the rest of the UI if email is valid
+if email and is_valid_email(email):
+    st.success(f"Thanks for subscribing, {email}!")
 
-    st.success(f"Generated {len(posts)} posts for niche '{niche}':")
+    # User inputs
+    niche = st.text_input("Enter niche:", placeholder="e.g., nails, fitness, tech gadgets")
+    count = st.number_input("Number of posts (max 5):", min_value=1, max_value=5, value=1, step=1)
 
-    # Display posts with spacing
-    for post in post_list:
-        st.write(post)
-        st.markdown("---")
+    # Generate posts
+    if st.button("Generate Posts"):
+        with st.spinner("Generating posts..."):
+            posts = generate_posts(niche, count)
+            posts = clean_hashtags(posts)
+            post_list = get_post_strings(posts)
+            st.session_state['posts'] = posts
+            st.session_state['post_list'] = post_list
+            st.session_state['niche'] = niche
 
-    # Prepare downloadable files
-    txt_content = "\n\n".join([p['text'] for p in posts])
-    df = pd.DataFrame(posts)
-    df_csv = df[['text']].to_csv(index=False)
+    # Display & download if posts exist
+    if 'posts' in st.session_state and st.session_state['posts']:
+        posts = st.session_state['posts']
+        post_list = st.session_state['post_list']
+        niche = st.session_state['niche']
 
-    # Download buttons (always visible if posts exist)
-    st.download_button(
-        label="Download TXT",
-        data=txt_content,
-        file_name=f"{niche.replace(' ', '_')}.txt",
-        mime="text/plain"
-    )
+        st.success(f"Generated {len(posts)} posts for niche '{niche}':")
 
-    st.download_button(
-        label="Download CSV",
-        data=df_csv,
-        file_name=f"{niche.replace(' ', '_')}.csv",
-        mime="text/csv"
-    )
+        for post in post_list:
+            st.write(post)
+            st.markdown("---")
+
+        txt_content = "\n\n".join([p['text'] for p in posts])
+        df = pd.DataFrame(posts)
+        df_csv = df[['text']].to_csv(index=False)
+
+        st.download_button("Download TXT", txt_content, f"{niche}.txt", mime="text/plain")
+        st.download_button("Download CSV", df_csv, f"{niche}.csv", mime="text/csv")
+
+# If email entered but invalid
+elif email:
+    st.error("Please enter a valid email to continue.")
+
 ```
 # Run your interactive streamlit dashboard and test it out
 

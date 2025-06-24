@@ -7,6 +7,9 @@ from llm_setup import chain
 
 def clean_hashtags(posts):
     for post in posts:
+        if not isinstance(post, dict):
+            print(f"⚠️ Skipping invalid post (not a dict): {post} (type={type(post)})")
+            continue
         hashtags = post.get("hashtags", "")
         if isinstance(hashtags, str):
             tags_list = hashtags.split()
@@ -20,19 +23,30 @@ def clean_hashtags(posts):
 
 def generate_posts(niche, count=5):
     result = chain.invoke({"niche": niche, "count": count})
+    print(f"DEBUG: Raw result from chain.invoke:\n{result}\n")
     try:
         posts = json.loads(result)
-        
-        # If posts is a dict with keys like Post1, Post2, convert to list:
+        print(f"DEBUG: Type of posts after JSON load: {type(posts)}")
+
         if isinstance(posts, dict):
-            # Extract values (post dicts) and sort by key to keep order if needed
+            # If posts is a dict, convert to list by sorted keys
             posts_list = [posts[k] for k in sorted(posts.keys())]
             posts = posts_list
-        
+
+        # Flatten any nested lists inside posts (if any post is itself a list)
+        fixed_posts = []
+        for post in posts:
+            if isinstance(post, list):
+                print(f"DEBUG: Flattening nested list post: {post}")
+                fixed_posts.extend(post)
+            else:
+                fixed_posts.append(post)
+        posts = fixed_posts
+
         if not isinstance(posts, list):
-            print("⚠️ Expected list, got:", type(posts))
+            print("⚠️ Expected a list of posts but got:", type(posts))
             return []
-        
+
         return posts[:count]
     except json.JSONDecodeError:
         print("⚠️ Failed to decode JSON. Raw output:", result)
@@ -41,6 +55,9 @@ def generate_posts(niche, count=5):
 def get_post_strings(posts):
     lines = []
     for p in posts:
+        if not isinstance(p, dict):
+            print(f"⚠️ Skipping invalid post in get_post_strings: {p} (type={type(p)})")
+            continue
         text = p.get('text', '').strip()
         hashtags = p.get('hashtags', [])
         clean_tags = [tag.strip().replace(" ", "") for tag in hashtags if tag.strip()]
@@ -65,25 +82,22 @@ def save_to_files(posts, filename_prefix="posts"):
     df.to_csv(f"{filename_prefix}.csv", index=False)
     print(f"✅ Posts saved to {filename_prefix}.csv")
 
-
 if __name__ == "__main__":
     niche = input("Enter niche: ")
     count = int(input("Number of posts: "))
     posts = generate_posts(niche, count)
     posts = clean_hashtags(posts)
 
-    # Get list of strings ready for copy-paste
     post_list = get_post_strings(posts)
 
     print("\nHere is the list of posts with hashtags (copy and paste as needed):\n")
-    print(post_list)  # prints the Python list syntax
+    print(post_list)
 
-    # Optional: print each post on its own line for easy reading
     print("\n--- Posts preview ---")
     for post in post_list:
         print(post)
-        print()  # <-- this adds a blank line between posts
+        print()
     print("---------------------\n")
 
-    # Save files as before
     save_to_files(posts, niche.replace(" ", "_"))
+
