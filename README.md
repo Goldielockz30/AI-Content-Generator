@@ -1,4 +1,4 @@
-# Creats an AI Content Generator - Step by Step Guide
+# Create an AI Content Generator - Step by Step Guide
 
 Build your own AI-powered content generator using fully local tools (no OpenAI). 
 
