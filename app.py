@@ -53,15 +53,12 @@ def add_subscriber_to_group(email, niche):
 
 st.title("✨ Social Media Post Generator")
 
-# NEW: Ask for OpenAI API key
-api_key = st.text_input("Enter your OpenAI API key", type="password")
-
 email = st.text_input("Enter your email to get started:")
 
 def is_valid_email(e):
     return "@" in e and "." in e and len(e) > 5
 
-if api_key and email and is_valid_email(email):
+if email and is_valid_email(email):
     niche = st.text_input("Enter niche:", placeholder="e.g., nails, fitness, tech gadgets")
     count = st.number_input("Number of posts (max 5):", min_value=1, max_value=5, value=1, step=1)
 

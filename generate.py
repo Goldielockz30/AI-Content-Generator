@@ -3,6 +3,7 @@
 
 import json
 import pandas as pd
+import streamlit as st  # Needed for caching
 from llm_setup import setup_chain  # new import
 
 def clean_hashtags(posts):
@@ -21,6 +22,7 @@ def clean_hashtags(posts):
         post['hashtags'] = [tag.replace(" ", "") for tag in tags_list if tag.strip()]
     return posts
 
+@st.cache_data(show_spinner=False)
 def generate_posts(niche, count=5, api_key=None):
     if not api_key:
         print("❌ API key is required to generate posts.")
@@ -31,7 +33,8 @@ def generate_posts(niche, count=5, api_key=None):
     print(f"DEBUG: Raw result from chain.invoke:\n{result}\n")
 
     try:
-        posts = json.loads(result)
+        raw_text = result.content  # ✅ FIX: Extract string from AIMessage
+        posts = json.loads(raw_text)
         print(f"DEBUG: Type of posts after JSON load: {type(posts)}")
 
         if isinstance(posts, dict):
@@ -52,7 +55,7 @@ def generate_posts(niche, count=5, api_key=None):
 
         return posts[:count]
     except json.JSONDecodeError:
-        print("⚠️ Failed to decode JSON. Raw output:", result)
+        print("⚠️ Failed to decode JSON. Raw output:", raw_text)
         return []
 
 def get_post_strings(posts):
