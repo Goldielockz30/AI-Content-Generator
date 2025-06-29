@@ -51,7 +51,7 @@ def add_subscriber_to_group(email, niche):
         st.error(f"MailerLite error ({response.status_code}): {response.text}")
         return False
 
-st.title("✨ Social Media Post Generator")
+st.title("✨ Social Media Caption Generator")
 
 email = st.text_input("Enter your email to get started:")
 
