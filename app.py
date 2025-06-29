@@ -12,12 +12,12 @@ api_key = st.secrets["openai_api_key"]
 MAILERLITE_API_KEY = st.secrets["mailerlite"]["api_key"]
 GROUP_ID = st.secrets["mailerlite"]["group_id"]  # The group ID for your list/group like "All Leads"
 
-# Check if secrets are loaded correctly
+""" # Check if secrets are loaded correctly
 st.title("🔐 Secret Key Test")
 st.write("🔐 OpenAI Key Loaded:", bool(st.secrets["openai_api_key"]))
 st.write("📧 MailerLite API Key Loaded:", bool(st.secrets["mailerlite"]["api_key"]))
 st.write("📧 MailerLite Group ID Loaded:", bool(st.secrets["mailerlite"]["group_id"]))
-
+"""
 
 
 HEADERS = {
