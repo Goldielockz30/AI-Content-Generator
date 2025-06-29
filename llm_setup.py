@@ -1,6 +1,8 @@
 from langchain_core.prompts import PromptTemplate
-from langchain_ollama.llms import OllamaLLM
+from langchain_openai import ChatOpenAI
+import os
 
+# Setup prompt template
 prompt = PromptTemplate(
     input_variables=["niche", "count"],
     template=(
@@ -16,9 +18,12 @@ prompt = PromptTemplate(
     )
 )
 
-llm = OllamaLLM(
-    model="mistral",
-    format=""  # disable auto JSON parsing to handle manually
-)
-
-chain = prompt | llm
+# Initialize OpenAI Mistral model
+def setup_chain(api_key):
+    llm = ChatOpenAI(
+        model="mistral-small-latest",  # You can use "mistral-medium-latest" if you prefer
+        temperature=0.7,
+        api_key=api_key
+    )
+    chain = prompt | llm
+    return chain

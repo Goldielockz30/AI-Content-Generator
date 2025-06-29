@@ -3,7 +3,7 @@
 
 import json
 import pandas as pd
-from llm_setup import chain
+from llm_setup import setup_chain  # new import
 
 def clean_hashtags(posts):
     for post in posts:
@@ -21,19 +21,22 @@ def clean_hashtags(posts):
         post['hashtags'] = [tag.replace(" ", "") for tag in tags_list if tag.strip()]
     return posts
 
-def generate_posts(niche, count=5):
+def generate_posts(niche, count=5, api_key=None):
+    if not api_key:
+        print("❌ API key is required to generate posts.")
+        return []
+
+    chain = setup_chain(api_key)
     result = chain.invoke({"niche": niche, "count": count})
     print(f"DEBUG: Raw result from chain.invoke:\n{result}\n")
+
     try:
         posts = json.loads(result)
         print(f"DEBUG: Type of posts after JSON load: {type(posts)}")
 
         if isinstance(posts, dict):
-            # If posts is a dict, convert to list by sorted keys
-            posts_list = [posts[k] for k in sorted(posts.keys())]
-            posts = posts_list
+            posts = [posts[k] for k in sorted(posts.keys())]
 
-        # Flatten any nested lists inside posts (if any post is itself a list)
         fixed_posts = []
         for post in posts:
             if isinstance(post, list):
@@ -61,7 +64,7 @@ def get_post_strings(posts):
         text = p.get('text', '').strip()
         hashtags = p.get('hashtags', [])
         clean_tags = [tag.strip().replace(" ", "") for tag in hashtags if tag.strip()]
-        line = text # Hashtags already included in 'text'
+        line = text
         lines.append(line)
     return lines
 
@@ -76,16 +79,16 @@ def save_to_files(posts, filename_prefix="posts"):
 
     print(f"✅ Posts saved to {filename_prefix}.txt")
 
-    # Save only 'text' column to CSV, since it has hashtags inside
     df = pd.DataFrame(posts)
-    df = df[['text']]  # keep only text column
+    df = df[['text']]
     df.to_csv(f"{filename_prefix}.csv", index=False)
     print(f"✅ Posts saved to {filename_prefix}.csv")
 
 if __name__ == "__main__":
     niche = input("Enter niche: ")
     count = int(input("Number of posts: "))
-    posts = generate_posts(niche, count)
+    api_key = input("Enter your OpenAI API key: ")
+    posts = generate_posts(niche, count, api_key=api_key)
     posts = clean_hashtags(posts)
 
     post_list = get_post_strings(posts)
@@ -100,4 +103,3 @@ if __name__ == "__main__":
     print("---------------------\n")
 
     save_to_files(posts, niche.replace(" ", "_"))
-

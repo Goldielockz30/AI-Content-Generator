@@ -4,9 +4,21 @@ import pandas as pd
 import re
 from generate import generate_posts, clean_hashtags, get_post_strings
 
+# 🔐 OpenAI API Key
+
+api_key = st.secrets["openai_api_key"]
 # MailerLite API settings
+
 MAILERLITE_API_KEY = st.secrets["mailerlite"]["api_key"]
 GROUP_ID = st.secrets["mailerlite"]["group_id"]  # The group ID for your list/group like "All Leads"
+
+# Check if secrets are loaded correctly
+st.title("🔐 Secret Key Test")
+st.write("🔐 OpenAI Key Loaded:", bool(st.secrets["openai_api_key"]))
+st.write("📧 MailerLite API Key Loaded:", bool(st.secrets["mailerlite"]["api_key"]))
+st.write("📧 MailerLite Group ID Loaded:", bool(st.secrets["mailerlite"]["group_id"]))
+
+
 
 HEADERS = {
     "Content-Type": "application/json",
@@ -21,7 +33,6 @@ def format_niche_tag(niche):
 def add_subscriber_to_group(email, niche):
     tag = format_niche_tag(niche)
 
-    # Step 1: Try adding or updating subscriber directly
     url = "https://api.mailerlite.com/api/v2/subscribers"
     data = {
         "email": email,
@@ -40,14 +51,17 @@ def add_subscriber_to_group(email, niche):
         st.error(f"MailerLite error ({response.status_code}): {response.text}")
         return False
 
-st.title("Social Media Post Generator")
+st.title("✨ Social Media Post Generator")
+
+# NEW: Ask for OpenAI API key
+api_key = st.text_input("Enter your OpenAI API key", type="password")
 
 email = st.text_input("Enter your email to get started:")
 
 def is_valid_email(e):
     return "@" in e and "." in e and len(e) > 5
 
-if email and is_valid_email(email):
+if api_key and email and is_valid_email(email):
     niche = st.text_input("Enter niche:", placeholder="e.g., nails, fitness, tech gadgets")
     count = st.number_input("Number of posts (max 5):", min_value=1, max_value=5, value=1, step=1)
 
@@ -57,8 +71,9 @@ if email and is_valid_email(email):
                 subscribed = add_subscriber_to_group(email, niche)
                 if subscribed:
                     st.success(f"Thanks for subscribing with niche '{niche}'!")
-                    
-                    posts = generate_posts(niche, count)
+
+                    # ✅ Pass API key to generate_posts()
+                    posts = generate_posts(niche, count, api_key=api_key)
                     posts = clean_hashtags(posts)
                     post_list = get_post_strings(posts)
                     st.session_state['posts'] = posts
@@ -76,10 +91,6 @@ if email and is_valid_email(email):
             st.write(post)
             st.markdown("---")
 
-        for i, p in enumerate(posts):
-            if 'text' not in p:
-                st.warning(f"Warning: post #{i} missing 'text': {p}")
-
         txt_content = "\n\n".join([p.get('text', '') for p in posts])
         df = pd.DataFrame(posts)
         df_csv = df[['text']].to_csv(index=False)
@@ -89,3 +100,6 @@ if email and is_valid_email(email):
 
 elif email:
     st.error("Please enter a valid email to continue.")
+
+elif api_key == "":
+    st.warning("Please enter your OpenAI API key to use the generator.")
